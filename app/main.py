@@ -1,7 +1,7 @@
 """
-Back2Work Bot - Main Application
-=================================
-Streamlit application for post-vacation email analysis.
+Back2Work Bot - Aplicación Principal
+====================================
+Aplicación en Streamlit para el análisis de correos electrónicos tras vacaciones.
 """
 
 import streamlit as st
@@ -18,7 +18,7 @@ import pandas as pd
 from urllib.parse import quote
 from openai import OpenAI
 
-# Local imports
+# Importaciones locales
 from config import (
     SANDOZ_NAVY, SANDOZ_BLUE, SANDOZ_LIGHT_BLUE, 
     SANDOZ_PALE, SANDOZ_SEQ, MAX_LLM_CALLS, MODEL,
@@ -37,7 +37,7 @@ from gmail_connector import GmailConnector
 
 
 # ============================================================================
-# PAGE CONFIGURATION
+# CONFIGURACIÓN DE LA PÁGINA
 # ============================================================================
 
 st.set_page_config(
@@ -65,7 +65,7 @@ st.markdown("""
 
 
 # ============================================================================
-# VISUALIZATION HELPERS
+# FUNCIONES AUXILIARES DE VISUALIZACIÓN
 # ============================================================================
 
 def generate_interactive_plotly(df, lang="es"):
@@ -73,7 +73,7 @@ def generate_interactive_plotly(df, lang="es"):
     colors = [SANDOZ_NAVY, SANDOZ_BLUE, SANDOZ_LIGHT_BLUE, SANDOZ_PALE]
     h_size = 320  
     
-    # 1. Top Senders
+    # 1. Principales remitentes
     top_senders = df['sender'].value_counts().head(10).reset_index()
     top_senders.columns = ['sender', 'count']
 
@@ -89,7 +89,7 @@ def generate_interactive_plotly(df, lang="es"):
         margin=dict(l=10, r=10, t=10, b=10) 
     )
 
-    # 2. Priority (Treemap)
+    # 2. Prioridad (Treemap / Mapa jerárquico)
     prio_df = df['priority'].value_counts().reset_index()
     prio_df.columns = ['priority', 'count']
 
@@ -103,7 +103,7 @@ def generate_interactive_plotly(df, lang="es"):
         margin=dict(l=5, r=5, t=5, b=5) 
     )
 
-    # 3. Email Type
+    # 3. Tipo de correo electrónico
     type_df = df['email_type'].value_counts().reset_index()
     type_df.columns = ['email_type', 'count']
     
@@ -118,7 +118,7 @@ def generate_interactive_plotly(df, lang="es"):
         margin=dict(l=10, r=10, t=10, b=10)
     )
 
-    # 4. Projects
+    # 4. Proyectos
     proj_df = df[df['project'] != 'None']['project'].value_counts().reset_index()
     proj_df.columns = ['project', 'count']
 
@@ -137,14 +137,14 @@ def generate_interactive_plotly(df, lang="es"):
 
 
 # ============================================================================
-# EMAIL DETAIL MODAL
+# MODAL DE DETALLE DEL CORREO
 # ============================================================================
 
 @st.dialog("📧 Detalles del Correo")
 def show_email_popup(row_data, lang, popup_key="default"):
-    """Display email details in a modal popup."""
+    """Mostrar los detalles del correo en una ventana modal."""
     
-    # Priority badge with urgency
+    # # Insignia de prioridad con nivel de urgencia
     action_level = row_data.get('action_level', 'None')
     urgency = row_data.get('urgency', 'Low')
     
@@ -157,7 +157,7 @@ def show_email_popup(row_data, lang, popup_key="default"):
     
     text_color, bg_color = urgency_colors.get(urgency, ("#666666", "#F0F0F0"))
     
-    # Translate levels
+    # Traducción de niveles
     if lang == "es":
         action_text = "Obligatoria" if action_level == "Mandatory" else "Opcional"
         urgency_map = {
@@ -171,7 +171,7 @@ def show_email_popup(row_data, lang, popup_key="default"):
         action_text = action_level
         urgency_text = "Long term" if urgency == "Low" else urgency
     
-    # Status banner
+    # Banner de estado
     st.markdown(
         f"""<div style="background-color: {bg_color}; 
                       padding: 16px; 
@@ -183,14 +183,14 @@ def show_email_popup(row_data, lang, popup_key="default"):
         unsafe_allow_html=True
     )
     
-    # Deadline
+    # Fecha límite
     deadline = row_data.get('deadline')
     if deadline and str(deadline) != 'None':
         st.markdown(f"### 📅 {deadline}")
     
     st.markdown("---")
     
-    # Basic info
+    # Información básica
     col1, col2 = st.columns([1, 3])
     
     with col1:
@@ -209,7 +209,7 @@ def show_email_popup(row_data, lang, popup_key="default"):
     
     st.markdown("---")
     
-    # Tasks
+    # Tareas
     st.markdown(f"### ✅ {'Tareas Pendientes:' if lang == 'es' else 'Pending Tasks:'}")
     
     tasks = row_data.get('tasks', [])
@@ -230,13 +230,13 @@ def show_email_popup(row_data, lang, popup_key="default"):
     
     st.markdown("---")
     
-    # Summary
+    # Resumen
     st.markdown(f"### 📝 {'Resumen:' if lang == 'es' else 'Summary:'}")
     st.info(row_data.get('summary', 'Sin resumen disponible' if lang == "es" else 'No summary available'))
     
     st.markdown("---")
 
-    # Gmail integration with authuser
+    # Integración con Gmail usando authuser
     current_user_email = st.session_state.get('user_email', '')
     thread_id = str(row_data.get('threadId', '')).strip()
     has_thread_id = (thread_id and thread_id.lower() not in ['nan', 'none', ''])
@@ -266,7 +266,7 @@ def show_email_popup(row_data, lang, popup_key="default"):
         btn_label = t("btn_reply_new", lang)
         btn_help = t("help_reply_new", lang)
 
-    # Action buttons
+    # Botones de acción
     col_btn1, col_btn2 = st.columns(2)
 
     with col_btn1:
@@ -287,7 +287,7 @@ def show_email_popup(row_data, lang, popup_key="default"):
             help=btn_help
         )
 
-    # Show body if requested
+    # Mostrar cuerpo del correo si se solicita
     if st.session_state.get(f"show_body_{popup_key}", False):
         st.markdown("### " + t("modal_body", lang))
         body_content = row_data.get('raw_body', 'No content available')
@@ -303,7 +303,7 @@ def show_email_popup(row_data, lang, popup_key="default"):
 
 
 # ============================================================================
-# MAIN APPLICATION
+# APLICACIÓN PRINCIPAL
 # ============================================================================
 
 def main():
@@ -541,7 +541,7 @@ def main():
                 # Convertir a DataFrame
                 df = pd.DataFrame(emails_data)
                 
-            # DATE FILTERING
+            # FILTRADO POR FECHA
             range_str = t("range_all", lang)
             if start_date and end_date and 'Received_date' in df.columns:
                 df['Received_date'] = pd.to_datetime(df['Received_date'], errors='coerce')
@@ -571,7 +571,7 @@ def main():
                 priority_projects_list = [x.strip() for x in proj_input.split(',') if x.strip()]
                 instruction_clean = kw_input.strip()
 
-                # MAIN LOOP
+                # BUCLE PRINCIPAL
                 for i, (idx, row) in enumerate(df_proc.iterrows()):
                     prog_bar.progress(min((i + 1) / len(df_proc), 1.0))
                     
@@ -606,11 +606,11 @@ def main():
                     
                     to_count = count_recipients(str(row.get(col["to_addr"], "")), str(row.get(col["cc_addr"], "")), str(row.get(col["bcc_addr"], "")))
 
-                    # 1. Detection
+                    # 1. Detección
                     is_phish = is_phishing(subj, body, s_addr)
                     is_sp = is_spam(subj, body, s_addr)
                     
-                    # 2. Security LLM
+                    # 2. Análisis de seguridad con LLM
                     security_analysis = {}
                     if llm_calls < MAX_LLM_CALLS and (is_phish or is_sp) and llm_calls < 30:
                         security_analysis = llm_security_analysis(client, subj, f"{s_name} <{s_addr}>", body)
@@ -620,7 +620,7 @@ def main():
                     is_phish = security_analysis.get("is_phishing", is_phish)
                     is_sp = security_analysis.get("is_spam", is_sp)
 
-                    # 3. Whitelist Check
+                    # 3. Verificación de lista blanca (whitelist)
                     dom = sender_domain(s_addr)
                     full_text_check = (subj + " " + s_name + " " + s_addr + " " + body[:500]).lower()
                     whitelist_keywords = ["quip digest", "quip updates", "sandoz group ag", "weekly digest", "iberia", "vuelo", "flight", "jira", "confluence", "sharepoint"]
@@ -633,7 +633,7 @@ def main():
                         is_sp = False
                         if risk_level == "critical": risk_level = "medium"
 
-                    # 5. Content Analysis
+                    # 5. Análisis de contenido
                     main_body = extract_main(body, subj)
                     raw_date = row.get("Received_date")
                     try:
@@ -836,7 +836,7 @@ def main():
                 st.session_state.result_df = unify_projects_in_df(st.session_state.result_df, project_col="project")
                 
                 # Generar Resumen
-                high_prio = st.session_state.result_df[st.session_state.result_df["priority"] == "High"].sort_values("score", ascending=False).to_dict("records")
+                high_prio = st.session_state.result_df[st.session_state.result_df["priority"] == "High"].sort_values("score", ascending=False).head(10).to_dict("records")
                 st.session_state.summary_text = llm_overall_summary(client, high_prio, len(st.session_state.result_df), range_str,lang=lang)
 
     
