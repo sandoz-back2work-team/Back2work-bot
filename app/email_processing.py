@@ -12,19 +12,19 @@ import pandas as pd
 from config import MAX_BODY_CHARS
 
 # ============================================================================
-# JSON EXTRACTION UTILITY
+# UTILIDAD DE EXTRACCIÓN JSON
 # ============================================================================
 
 def safe_extract_json(text: str) -> Dict[str, Any]:
     """
-    Extract JSON from text that may contain markdown or additional text.
-    Searches for the first valid JSON block.
+    Extrae JSON de texto que puede contener markdown o texto adicional.
+    Busca el primer bloque JSON válido.
     
     Args:
-        text: Raw text potentially containing JSON
+        text: Texto sin formato que puede contener JSON
         
     Returns:
-        Parsed JSON dict or empty dict if not found
+        Diccionario JSON parseado o diccionario vacío si no se encuentra
     """
     # Try direct parsing first
     try:
@@ -102,7 +102,7 @@ def _split_contacts(field: str) -> List[Dict[str, str]]:
     Parsea campos To/Cc que vengan como 'Name <email>' o listas separadas por coma/;
     
     Returns:
-        List of dicts with 'raw', 'name', and 'email' keys
+        Lista de diccionarios que contienen las claves 'raw', 'name' y 'email'
     """
     if not field:
         return []
@@ -239,7 +239,7 @@ def identify_user_role(
     Identifica el rol del usuario en un email (sender, primary recipient, CC)
     
     Returns:
-        Dict with is_sender, is_primary_recipient, is_cc, user_variations
+        # Diccionario con las claves 'is_sender', 'is_primary_recipient', 'is_cc' y 'user_variations'
     """
     user_name_clean = _norm(user_name)
     from_name_clean = _norm(from_name)
