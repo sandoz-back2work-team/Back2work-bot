@@ -17,6 +17,35 @@ Back2Work Bot es una aplicación de Streamlit que utiliza OpenAI GPT-4 para anal
 - **Multiidioma**: Soporte para español e inglés
 - **Priorización personalizada**: Configuración de remitentes VIP y proyectos clave
 
+## Estructura del Proyecto
+```
+Back2work-bot/
+├── app/
+│   ├── main.py                 # Aplicación principal Streamlit
+│   ├── gmail_connector.py      # Integración con Gmail API
+│   └── ...
+├── docs/
+│   └── manual_usuario.pdf      # 📘 Documentación completa (TFM)
+├── local/secrets/              # ⚠️ Crear localmente (ver abajo)
+│   ├── .env                    # Tu OpenAI API Key
+│   └── credentials.json        # Gmail OAuth (opcional)
+├── requirements.txt
+├── iniciar_bot.bat             # Script de inicio Windows
+└── README.md
+```
+
+### Sobre `local/secrets/`
+
+Estos archivos **NO están en GitHub** por seguridad y debes crearlos manualmente.
+
+**Consulta**:
+- La sección [**Instalación**](#-instalación) más abajo para configuración rápida
+- El [**Manual de Usuario**](docs/manual_usuario.pdf) para guía detallada paso a paso
+
+> Los archivos de credenciales están protegidos en `.gitignore` y nunca se subirán al repositorio.
+
+---
+
 ## Instalación
 
 ### Requisitos Previos
@@ -64,7 +93,7 @@ Para usar la integración con Gmail:
 - Descargar credenciales OAuth 2.0
 - Guardar como `credentials.json` en `local/secrets/`
 
-## 💻 Uso
+## Uso
 
 ### Iniciar la aplicación
 
@@ -74,7 +103,7 @@ iniciar_bot.bat
 ```
 (doble clic o desde terminal)
 
-**Mac / 🐧 Linux**: 
+**Mac / Linux**: 
 ```bash
 source venv/bin/activate
 streamlit run app/main.py
@@ -108,7 +137,7 @@ La aplicación se abrirá en tu navegador en `http://localhost:8501`
    - **Gráficas**: Dashboard interactivo
    - **Chat IA**: Consultas sobre tus correos
   
-## 📖 Documentación
+## Documentación
 
 Este proyecto incluye documentación completa del Trabajo de Fin de Grado:
 
@@ -123,32 +152,6 @@ El manual incluye:
 Para un inicio rápido, sigue las instrucciones abajo. Para información detallada, consulta el manual.
 
 ---
-
-## Estructura del Proyecto
-
-### Archivos en el Repositorio
-```
-Back2work-bot/
-├── app/                        # Código fuente principal
-│   ├── main.py                 # Aplicación Streamlit
-│   ├── gmail_connector.py      # Integración Gmail
-│   └── ...                     # Otros módulos
-├── requirements.txt            # Dependencias Python
-├── iniciar_bot.bat             # Launcher Windows
-├── .gitignore
-└── README.md
-```
-
-### Archivos Locales (Debes Crear)
-```
-local/
-└── secrets/                    # ⚠️ NO incluido en git
-    ├── .env                    # Tu OpenAI API Key
-    └── credentials.json        # Gmail OAuth (opcional)
-```
-
-> **Seguridad**: Nunca subas archivos de `local/secrets/` a GitHub. 
-> Ya están protegidos en `.gitignore`.
 
 ## Seguridad y Privacidad
 
@@ -188,7 +191,10 @@ Las contribuciones son bienvenidas. Por favor:
 
 ## Licencia
 
-Este proyecto está bajo la Licencia MIT. Ver archivo `LICENSE` para más detalles.
+Este proyecto está bajo la Licencia Apache 2.0. Ver archivo `LICENSE` para más detalles.
+
+**En resumen**: Puedes usar, modificar y distribuir este código libremente, 
+incluso con fines comerciales, siempre que incluyas el aviso de copyright y la licencia.
 
 ## Autores
 
