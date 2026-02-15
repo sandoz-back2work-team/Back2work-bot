@@ -1,10 +1,10 @@
 """
-LLM Module - OpenAI Integration
-================================
-Handles all interactions with OpenAI API including:
-- Email classification and analysis
-- Task extraction
-- Executive summaries
+Módulo LLM - Integración con OpenAI
+===================================
+Gestiona todas las interacciones con la API de OpenAI, incluyendo:
+- Clasificación y análisis de correos electrónicos
+- Extracción de tareas
+- Resúmenes ejecutivos
 """
 
 import json
@@ -22,7 +22,7 @@ from priority_engine import calculate_priority_score, map_to_priority
 
 
 # ============================================================================
-# OPENAI CLIENT SETUP
+# CONFIGURACIÓN DEL CLIENTE DE OPENAI
 # ============================================================================
 
 @st.cache_resource
@@ -31,7 +31,7 @@ def get_openai_client():
     return OpenAI(api_key=api_key)
 
 # ============================================================================
-# ADVANCED EMAIL ANALYSIS
+# ANÁLISIS AVANZADO DE CORREOS ELECTRÓNICOS
 # ============================================================================
 
 def llm_email_analysis_enhanced(
@@ -49,7 +49,7 @@ def llm_email_analysis_enhanced(
     is_spam: bool = False
 ) -> Dict[str, Any]:
     """
-    Comprehensive LLM-based email analysis with user context.
+    Análisis integral de correos electrónicos basado en LLM con contexto del usuario.
     
     Args:
         client: OpenAI client
@@ -66,9 +66,9 @@ def llm_email_analysis_enhanced(
         is_spam: Security flag
         
     Returns:
-        Dict with priority, score, summary, tasks, etc.
+        Diccionario con prioridad, puntuación, resumen, tareas, etc.
     """
-    # 1. User priority instruction
+    # 1. Instrucción de prioridad del usuario
     custom_instruction = user_config.get("priority_instruction", "").strip()
     
     instruction_block = ""
@@ -100,7 +100,7 @@ def llm_email_analysis_enhanced(
     ]):
         context_hint = "\n⚠️ CRITICAL: The subject line indicates this requires APPROVAL/ACTION. Classify as Approval_Request or Action_Request accordingly."
 
-    # Identify user role
+    # # Identificar el rol del usuario
     user_role = identify_user_role(
         user_name=user_name_input,
         from_name=sender.split('<')[0].strip() if '<' in sender else sender,
@@ -109,7 +109,7 @@ def llm_email_analysis_enhanced(
         cc_field=str(user_config.get('cc_field', ''))
     )
     
-    # Build role context
+    # Construir el contexto del rol
     role_context = ""
     if user_role["is_sender"]:
         role_context = f"\n⚠️ CRITICAL: {user_name_input} is the SENDER of this email. Do NOT assign tasks to them unless they explicitly assign themselves a follow-up action."
@@ -120,14 +120,14 @@ def llm_email_analysis_enhanced(
     else:
         role_context = f"\n⚠️ {user_name_input} does not appear in To/CC/From. Verify carefully if tasks apply to them."
         
-    # Body limit (longer for training emails)
+    # # Límite del cuerpo del mensaje (más amplio para correos de entrenamiento)
     body_limit = LLM_BODY_CHARS
     if "csod.com" in sender.lower() or "training" in subject.lower(): 
         body_limit = 6000
 
     target_lang = "Spanish" if lang == "es" else "English"
 
-    # Examples based on language
+    # Ejemplos según el idioma
     if lang == "es":
         ex_spec = '"Revisar los indicadores de calidad y confirmar cambios"'
         ex_who = '"Responder a Isabel sobre el proyecto"'
@@ -141,7 +141,7 @@ def llm_email_analysis_enhanced(
         ex_coord = '["Review the indicators"]'
         lang_note = "Even if the email is in Spanish, TRANSLATE the tasks to English."
     
-    # FULL PROMPT
+    # PROMPT COMPLETO
     prompt = f"""You are an intelligent email classification system for {user_name_input}, a busy professional returning from vacation.
 {context_hint}
 {role_context}
@@ -334,7 +334,7 @@ Respond ONLY with valid JSON (no markdown):
         raw_resp = resp.choices[0].message.content.strip()
         data = safe_extract_json(raw_resp)
         
-        # SUMMARY VALIDATION
+        # VALIDACIÓN DEL RESUMEN
         summary = str(data.get("summary", "")).strip()
         if not summary or summary == subject or len(summary) < 30:
             body_preview = body[:300].replace("\n", " ").strip()
@@ -344,7 +344,7 @@ Respond ONLY with valid JSON (no markdown):
             if str(data["deadline"]) not in summary:
                 summary += f" Deadline: {data['deadline']}."
         
-        # TASKS VALIDATION
+        # VALIDACIÓN DE TAREAS
         forbidden_tasks = ["stay informed", "monitor", "be aware", "keep in mind", "take action"]
         tasks = [t for t in data.get("actions", []) if not any(f in t.lower() for f in forbidden_tasks)]
         
@@ -356,10 +356,10 @@ Respond ONLY with valid JSON (no markdown):
 
         score = calculate_priority_score(data, importance, subject)
         
-        # Get forced priority
+        # Obtener la prioridad forzada por el usuario
         forced_prio = data.get("forced_priority")
 
-        # VIP projects logic
+        # Lógica de proyectos VIP
         detected_project = str(data.get("project", "")).strip()
         vip_projects_list = user_config.get("priority_projects", [])
         
@@ -371,7 +371,7 @@ Respond ONLY with valid JSON (no markdown):
                     forced_prio = "High"
                     break
         
-        # Final priority mapping
+        # Mapeo final de prioridades
         priority = map_to_priority(
             sender=sender, 
             subject=subject, 
@@ -427,7 +427,7 @@ Respond ONLY with valid JSON (no markdown):
 
 
 # ============================================================================
-# EXECUTIVE SUMMARY GENERATION
+# GENERACIÓN DE RESUMEN EJECUTIVO
 # ============================================================================
 
 def llm_overall_summary(
@@ -438,7 +438,7 @@ def llm_overall_summary(
     lang="es"
 ):
     """
-    Generate executive summary of high priority emails.
+    Genera un resumen ejecutivo de los correos de alta prioridad.
     
     Args:
         client: OpenAI client
@@ -448,7 +448,7 @@ def llm_overall_summary(
         lang: Language code (es/en)
         
     Returns:
-        Executive summary text
+        Texto del resumen ejecutivo
     """
     if not high_priority_emails: 
         return "ℹ️ No hay correos de alta prioridad para resumir." if lang == "es" else "ℹ️ No high priority emails found to summarize."
