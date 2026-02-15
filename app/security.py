@@ -1,8 +1,8 @@
 """
-Security Module - Spam and Phishing Detection
-==============================================
-Handles email security analysis including spam detection,
-phishing scoring, and LLM-based risk assessment.
+Módulo de Seguridad - Detección de Spam y Phishing
+===================================================
+Gestiona el análisis de seguridad de correos electrónicos incluyendo
+detección de spam, puntuación de phishing y evaluación de riesgo basada en LLM.
 """
 
 import re
@@ -17,25 +17,25 @@ from email_processing import sender_domain, safe_extract_json
 
 
 # ============================================================================
-# SPAM & PHISHING DETECTION
+# DETECCIÓN DE SPAM Y PHISHING
 # ============================================================================
 
 def phishing_score(subject: str, body: str, sender_addr: str) -> int:
     """
-    Calculate phishing risk score based on suspicious patterns.
+    Calcular puntuación de riesgo de phishing basada en patrones sospechosos.
     
     Args:
-        subject: Email subject line
-        body: Email body content
-        sender_addr: Sender email address
+        subject: Asunto del correo electrónico
+        body: Contenido del cuerpo del correo
+        sender_addr: Dirección de correo del remitente
         
     Returns:
-        Risk score from 0-20 (higher = more suspicious)
+        Puntuación de riesgo de 0-20 (mayor valor = más sospechoso)
     """
     s = f"{subject} {body} {sender_addr}".lower()
     score = 0
     
-    # Phishing keywords
+    # Palabras clave típicas de phishing
     phishing_keywords = [
         "verify", "verification", "password", "contraseña", "reset", 
         "restablecer", "account locked", "suspended", "unusual activity", 
@@ -45,7 +45,7 @@ def phishing_score(subject: str, body: str, sender_addr: str) -> int:
     if any(k in s for k in phishing_keywords): 
         score += 3
     
-    # Spam keywords
+    # Palabras clave típicas de spam
     spam_keywords = [
         "unsubscribe", "you have won", "congratulations", 
         "buy now", "free money"
@@ -53,7 +53,7 @@ def phishing_score(subject: str, body: str, sender_addr: str) -> int:
     if any(k in s for k in spam_keywords): 
         score += 2
     
-    # Urgency indicators
+    # Indicadores de urgencia
     urgent = [
         "urgent", "urgente", "asap", "immediately", 
         "critical", "act now"
@@ -64,14 +64,14 @@ def phishing_score(subject: str, body: str, sender_addr: str) -> int:
     elif urgent_count == 1: 
         score += 1
     
-    # URL count (suspicious if many links)
+    # Número de URLs (sospechoso si hay muchos enlaces)
     url_count = len(re.findall(r"\[URL\]", s))
     if url_count >= 5: 
         score += 4
     elif url_count >= 3: 
         score += 3
     
-    # Long sender address (often spam)
+    # Dirección de remitente larga (frecuente en spam)
     if "@" in sender_addr and len(sender_addr.split("@")[0]) > 20: 
         score += 1
     
@@ -80,24 +80,24 @@ def phishing_score(subject: str, body: str, sender_addr: str) -> int:
 
 def is_phishing(subject: str, body: str, sender_addr: str) -> bool:
     """
-    Determine if email is likely phishing.
+    Determinar si el correo probablemente es phishing.
     
     Args:
-        subject: Email subject
-        body: Email body
-        sender_addr: Sender address
+        subject: Asunto del correo
+        body: Cuerpo del correo
+        sender_addr: Dirección del remitente
         
     Returns:
-        True if phishing detected
+        True si se detecta phishing
     """
     score = phishing_score(subject, body, sender_addr)
     dom = sender_domain(sender_addr)
     
-    # High score = phishing
+    # Puntuación alta = phishing
     if score >= 10: 
         return True
     
-    # Medium score + untrusted domain = phishing
+    # Puntuación media + dominio no confiable = phishing
     if score >= 7 and dom and dom not in TRUSTED_SENDER_DOMAINS: 
         return True
     
@@ -106,33 +106,33 @@ def is_phishing(subject: str, body: str, sender_addr: str) -> bool:
 
 def is_spam(subject: str, body: str, sender_addr: str) -> bool:
     """
-    Determine if email is spam/marketing.
+    Determinar si el correo es spam o marketing.
     
     Args:
-        subject: Email subject
-        body: Email body
-        sender_addr: Sender address
+        subject: Asunto del correo
+        body: Cuerpo del correo
+        sender_addr: Dirección del remitente
         
     Returns:
-        True if spam detected
+        True si se detecta spam
     """
     dom = sender_domain(sender_addr)
     
-    # Trust known domains
+    # Confiar en dominios conocidos
     if dom in TRUSTED_SENDER_DOMAINS: 
         return False
     
     s = f"{subject} {body}".lower()
     sender_lower = sender_addr.lower()
     
-    # Common spam patterns
+    # Patrones comunes de remitentes de spam
     spam_senders = [
         "regaloresponsable", "noreply", "no-reply", "newsletter"
     ]
     if any(d in sender_lower for d in spam_senders): 
         return True
     
-    # Gift/marketing keywords
+    # Palabras clave relacionadas con regalos / marketing
     gift_keywords = [
         "cesta navidad", "obsequio", "regalo", 
         "gift card", "lotes navidad"
@@ -140,7 +140,7 @@ def is_spam(subject: str, body: str, sender_addr: str) -> bool:
     if any(kw in s for kw in gift_keywords): 
         return True
 
-    # Allow work tools
+    # Permitir herramientas de trabajo
     work_tools = [
         "quip", "jira", "confluence", "slack", "trello", 
         "teams", "planner", "sharepoint"
@@ -148,7 +148,7 @@ def is_spam(subject: str, body: str, sender_addr: str) -> bool:
     if any(tool in sender_lower or tool in s for tool in work_tools): 
         return False
     
-    # Allow travel confirmations
+    # Permitir confirmaciones de viaje
     travel_keywords = [
         "flight", "vuelo", "boarding", "embarque", "gate", 
         "puerta", "ticket", "billete", "renfe", "iberia"
@@ -156,11 +156,11 @@ def is_spam(subject: str, body: str, sender_addr: str) -> bool:
     if any(kw in s for kw in travel_keywords): 
         return False
     
-    # Allow internal newsletters from Sandoz
+    # Permitir newsletters internas
     if "sandoz" in sender_lower and ("digest" in s or "newsletter" in s): 
         return False
     
-    # Detect marketing training offers
+    # Detectar ofertas formativas de marketing
     is_marketing_training = (
         ("training" in s or "curso" in s) and 
         any(word in s for word in ["sin coste", "gratis", "free", "descuento", "oferta", "opcional"]) and 
@@ -169,7 +169,7 @@ def is_spam(subject: str, body: str, sender_addr: str) -> bool:
     if is_marketing_training: 
         return True
     
-    # Multiple spam markers
+    # Múltiples marcadores de spam
     spam_markers = [
         "unsubscribe", "newsletter", "promotional", "marketing", 
         "no-reply", "noreply", "you have won", "buy now"
@@ -189,16 +189,16 @@ def llm_security_analysis(
     body: str
 ) -> Dict[str, Any]:
     """
-    Use LLM to analyze email security risk.
+    Usar un LLM para analizar el riesgo de seguridad del correo.
     
     Args:
-        client: OpenAI client instance
-        subject: Email subject
-        sender: Sender name/address
-        body: Email body (truncated)
+        client: Instancia del cliente OpenAI
+        subject: Asunto del correo
+        sender: Nombre/dirección del remitente
+        body: Cuerpo del correo (truncado)
         
     Returns:
-        Dict with risk_level, is_phishing, is_spam, red_flags, explanation
+        Diccionario con: risk_level, is_phishing, is_spam, red_flags, explanation
     """
     prompt = f"""Analyze this email and return ONLY valid JSON:
 {{ "risk_level": "medium", "is_phishing": false, "is_spam": false, "red_flags": [], "explanation": "" }}
