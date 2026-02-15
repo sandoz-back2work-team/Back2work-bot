@@ -1,8 +1,8 @@
 """
-Priority Engine - Email Scoring and Prioritization
-==================================================
-Calculates priority scores and maps emails to High/Medium/Low levels
-based on business rules, urgency, and user preferences.
+Motor de Prioridad - Puntuación y Priorización de Correos
+==========================================================
+Calcula puntuaciones de prioridad y clasifica los correos en niveles
+Alta/Media/Baja según reglas de negocio, urgencia y preferencias del usuario.
 """
 
 import re
@@ -16,7 +16,7 @@ from config import TRUSTED_SENDER_DOMAINS
 
 
 # ============================================================================
-# PROJECT NAME UNIFICATION (Anti-duplicates)
+# UNIFICACIÓN DE NOMBRES DE PROYECTO (Eliminación de duplicados)
 # ============================================================================
 
 _PROJECT_PREFIX_RE = re.compile(r"^(proyecto|project|proj\.?|proy\.?)\s+", re.I)
@@ -105,21 +105,21 @@ def _projects_similar(a_key: str, b_key: str, a_orig: str = "", b_orig: str = ""
     if a_key == b_key:
         return True
 
-    # High similarity ratio
+    # Alta similitud entre cadenas
     r = difflib.SequenceMatcher(None, a_key, b_key).ratio()
     if r >= 0.88:
         return True
 
-    # Containment for long names
+    # Contención en nombres largos
     if (a_key in b_key or b_key in a_key) and min(len(a_key), len(b_key)) >= 4:
         return True
 
-    # Short project names
+    # Nombres de proyecto cortos
     if max(len(a_key), len(b_key)) <= 12:
         if a_key[:3] == b_key[:3] and r >= 0.80:
             return True
 
-    # Abbreviation vs full name
+    # Abreviatura frente a nombre completo
     if _is_abbrev_orig(a_orig) and len(a_key) <= 3:
         if (b_key.startswith(a_key + " ") or 
             (b_key.startswith(a_key) and b_key.isalpha() and len(b_key) >= 4)):
@@ -139,13 +139,13 @@ def _projects_similar(a_key: str, b_key: str, a_orig: str = "", b_orig: str = ""
 
 def build_project_canonical_map(project_values: List[Any]) -> Dict[str, str]:
     """
-    Build mapping from project name variations to canonical names.
+    Construir un mapeo desde variaciones de nombres de proyecto hacia un nombre canónico.
     
     Args:
-        project_values: List of all project names from emails
-        
+        project_values: Lista de todos los nombres de proyecto detectados en los correos
+    
     Returns:
-        Dict mapping each variation to its canonical name
+        Diccionario que mapea cada variación a su nombre canónico
     """
     counts: Dict[str, int] = {}
     for v in project_values or []:
@@ -159,10 +159,10 @@ def build_project_canonical_map(project_values: List[Any]) -> Dict[str, str]:
     if not counts:
         return {}
 
-    # Sort by frequency (most common first)
+    # Ordenar por frecuencia (los más comunes primero)
     uniques = sorted(counts.keys(), key=lambda x: (-counts[x], len(x)))
 
-    # Cluster similar names
+    # Agrupar nombres similares en clusters
     clusters: List[Dict[str, Any]] = []
     for orig in uniques:
         key = _proj_norm_key(orig)
@@ -177,7 +177,7 @@ def build_project_canonical_map(project_values: List[Any]) -> Dict[str, str]:
         if not placed:
             clusters.append({"key": key, "members": [orig], "repr": orig})
 
-    # Choose canonical name for each cluster
+    # Elegir el nombre canónico para cada cluster
     mapping: Dict[str, str] = {}
     for cl in clusters:
         members = cl["members"]
@@ -207,14 +207,14 @@ def build_project_canonical_map(project_values: List[Any]) -> Dict[str, str]:
 
 def unify_projects_in_df(df: pd.DataFrame, project_col: str = "project") -> pd.DataFrame:
     """
-    Unify project name variations in DataFrame.
+    Unificar variaciones de nombres de proyecto en un DataFrame.
     
     Args:
-        df: DataFrame with project column
-        project_col: Name of project column
-        
+        df: DataFrame que contiene la columna de proyectos
+        project_col: Nombre de la columna que contiene el proyecto
+    
     Returns:
-        DataFrame with unified project names
+        DataFrame con nombres de proyecto unificados
     """
     if df is None or df.empty or project_col not in df.columns:
         return df
@@ -236,20 +236,20 @@ def unify_projects_in_df(df: pd.DataFrame, project_col: str = "project") -> pd.D
 
 
 # ============================================================================
-# USER OVERRIDE LOGIC
+# LÓGICA DE PRIORIDAD FORZADA POR EL USUARIO
 # ============================================================================
 
 def check_user_overrides(text_content: str, sender: str, vip_senders: List[str]) -> bool:
     """
-    Check if email matches user VIP sender rules.
+    Comprobar si el correo coincide con las reglas de remitentes VIP definidas por el usuario.
     
     Args:
-        text_content: Combined subject + body
-        sender: Sender email address
-        vip_senders: List of VIP sender patterns
-        
+        text_content: Texto combinado de asunto + cuerpo
+        sender: Dirección del remitente
+        vip_senders: Lista de patrones de remitentes VIP
+    
     Returns:
-        True if sender matches VIP list
+        True si el remitente coincide con la lista VIP
     """
     sender_clean = sender.lower().strip()
     for vip_entry in vip_senders:
@@ -259,7 +259,7 @@ def check_user_overrides(text_content: str, sender: str, vip_senders: List[str])
 
 
 # ============================================================================
-# PRIORITY SCORING ENGINE
+# MOTOR DE CÁLCULO DE PRIORIDAD
 # ============================================================================
 
 def calculate_priority_score(
@@ -268,26 +268,26 @@ def calculate_priority_score(
     subject: str = ""
 ) -> int:
     """
-    Calculate numerical priority score (0-100).
+    Calcular puntuación numérica de prioridad (0-100).
     
     Args:
-        data: LLM analysis results
-        importance: Email importance flag
-        subject: Email subject line
-        
+        data: Resultados del análisis LLM
+        importance: Indicador de importancia del correo
+        subject: Línea de asunto
+    
     Returns:
-        Score from 0-100 (higher = more urgent)
+        Puntuación entre 0-100 (mayor valor = más urgente)
     """
     score = 50
     subject_lower = subject.lower()
     
-    # 1. Subject Flags
+    # 1. Indicadores en el asunto
     if "[high priority]" in subject_lower or "[urgent]" in subject_lower: 
         score += 20
     if importance and str(importance).strip().lower() == 'high': 
         score += 20
     
-    # 2. Email Type Weights
+    # 2. Pesos según tipo de correo
     type_weights = {
         "Approval_Request": 25, 
         "Decision_Required": 25, 
@@ -306,14 +306,14 @@ def calculate_priority_score(
     else:
         score += type_weights.get(email_type, 0)
     
-    # 3. Context & Penalties
+    # 3. Contexto y penalizaciones
     summary = str(data.get("summary", "")).lower()
     full_context_check = (
         subject_lower + " " + summary + " " + 
         str(data.get("project", "")).lower()
     )
 
-    # Spam/marketing penalties
+    # Penalización por spam/marketing
     spam_keywords = [
         "newsletter", "promotional", "black friday", 
         "sale", "unsubscribe", "club novartis"
@@ -329,7 +329,7 @@ def calculate_priority_score(
     if is_marketing_context: 
         score -= 15
 
-    # Thread closure detection
+    # Detección de cierre de hilo
     closure_keywords = [
         "confirmed completion", "task completed", "no action", 
         "thanks", "got it", "acknowledged"
@@ -337,7 +337,7 @@ def calculate_priority_score(
     if any(kw in summary for kw in closure_keywords): 
         score -= 20
     
-    # 4. Action/Decision Levels
+    # 4. Nivel de acción/decisión
     if data.get("action_level") == "Mandatory": 
         score += 20
     elif data.get("action_level") == "Optional": 
@@ -348,7 +348,7 @@ def calculate_priority_score(
     elif data.get("decision_level") == "Optional": 
         score += 10
     
-    # 5. Urgency
+    # 5. Urgencia
     urgency_weights = {
         "Immediate": 30, 
         "Short-term": 20, 
@@ -363,13 +363,13 @@ def calculate_priority_score(
         if detected_urgency in ["Immediate", "Short-term"]: 
             score -= 10
     
-    # 6. Blockers & Dependencies
+    # 6. Bloqueos y dependencias
     if data.get("blocks_others"): 
         score += 25
     if data.get("decision_pending"): 
         score += 15
     
-    # 7. Deadlines
+    # 7. Fechas límite
     if data.get("deadline") and not is_marketing_context:
         try:
             deadline = pd.to_datetime(data["deadline"])
@@ -411,7 +411,7 @@ def map_to_priority(
     is_spam: bool = False
 ) -> str:
     """
-    Map email to final priority level (High/Medium/Low).
+    Asignar el nivel final de prioridad (Alta/Media/Baja).
     
     Args:
         sender: Sender address
@@ -432,22 +432,22 @@ def map_to_priority(
     Returns:
         "High", "Medium", or "Low"
     """
-    # Security rule
+    # Regla de seguridad
     if is_phishing or is_spam:
         return "Low"
     
     user_config = user_config or {}
     full_text = f"{subject} {body}"
     
-    # VIP sender override
+    # Sobrescritura por remitente VIP
     if check_user_overrides(full_text, sender, user_config.get('vip_senders', [])):
         return "High"
 
-    # User forced priority
+    # Prioridad forzada por el usuario
     if forced_priority and forced_priority in ["High", "Medium", "Low"]:
         return forced_priority
     
-    # Corporate Benefits
+    # Beneficios corporativos
     is_trusted = any(d in sender.lower() for d in TRUSTED_SENDER_DOMAINS)
     benefit_keywords = [
         "cesta navidad", "lote navidad", 
@@ -456,7 +456,7 @@ def map_to_priority(
     if is_trusted and any(kw in subject.lower() for kw in benefit_keywords): 
         return "Medium"
     
-    # High Priority Rules
+    # Reglas de alta prioridad
     if any(kw in subject.lower() for kw in [
         "wants to share", "requested access", "sharing request"
     ]) and ("sharepoint" in sender.lower() or "confluence" in sender.lower()): 
@@ -473,7 +473,7 @@ def map_to_priority(
     if email_type == "External_Request" and urgency in ["Immediate", "Short-term"]: 
         return "High"
     
-    # Support / Help Requests
+    # Solicitudes de ayuda/soporte
     support_keywords = [
         "dare asking", "need your support", "asking for your support", 
         "need your help", "can you help", "asking for your help", 
@@ -483,14 +483,14 @@ def map_to_priority(
     if any(kw in body.lower() for kw in support_keywords): 
         return "Medium"
     
-    # Medium Priority (has actions)
+    # Prioridad media (si hay acciones)
     if action_level in ["Mandatory", "Optional"]:
         if score >= 50:
             return "Medium"
         else:
             return "Medium"
     
-    # Low Priority (spam from untrusted sources)
+    # Prioridad baja (spam de remitentes no confiables)
     if not is_trusted:
         spam_indicators = [
             "newsletter", "promotional", "unsubscribe", 
@@ -499,7 +499,7 @@ def map_to_priority(
         if any(indicator in full_text.lower() for indicator in spam_indicators):
             return "Low"
     
-    # Low Priority (no action + low urgency)
+    # Prioridad baja (sin acción + baja urgencia)
     if score < 30 and action_level == "None":
         return "Low"
     if urgency == "Low" and action_level == "None":
