@@ -64,21 +64,23 @@ Para usar la integración con Gmail:
 - Descargar credenciales OAuth 2.0
 - Guardar como `credentials.json` en `local/secrets/`
 
-## Uso
+## 💻 Uso
 
 ### Iniciar la aplicación
 
-#### **En Windows (Recomendado)**
-
-Simplemente haz doble clic en el archivo:
-```
-iniciar_bot.bat
-```
-
-O desde la terminal:
+**Windows**: 
 ```bash
 iniciar_bot.bat
 ```
+(doble clic o desde terminal)
+
+**Mac / 🐧 Linux**: 
+```bash
+source venv/bin/activate
+streamlit run app/main.py
+```
+
+La aplicación se abrirá en tu navegador en `http://localhost:8501`
 
 ### Flujo de Trabajo
 
