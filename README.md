@@ -105,6 +105,22 @@ iniciar_bot.bat
    - **Bandeja Priorizada**: Emails ordenados por importancia
    - **Gráficas**: Dashboard interactivo
    - **Chat IA**: Consultas sobre tus correos
+  
+## 📖 Documentación
+
+Este proyecto incluye documentación completa del Trabajo de Fin de Grado:
+
+📘 **[Manual de Usuario Completo (PDF)](docs/manual_usuario.pdf)**
+
+El manual incluye:
+- Guía de instalación paso a paso
+- Configuración de OpenAI API y Gmail
+- Casos de uso y ejemplos
+- Arquitectura del sistema
+
+Para un inicio rápido, sigue las instrucciones abajo. Para información detallada, consulta el manual.
+
+---
 
 ## Estructura del Proyecto
 
@@ -134,11 +150,11 @@ local/
 
 ## Seguridad y Privacidad
 
-- ✅ Las credenciales nunca se almacenan en el código
-- ✅ Autenticación OAuth 2.0 para Gmail
-- ✅ Detección automática de phishing y spam
-- ✅ Los datos se procesan localmente
-- ✅ No se almacenan emails en servidores externos
+- Las credenciales nunca se almacenan en el código
+- Autenticación OAuth 2.0 para Gmail
+- Detección automática de phishing y spam
+- Los datos se procesan localmente
+- No se almacenan emails en servidores externos
 
 ## Tecnologías Utilizadas
 
