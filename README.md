@@ -212,8 +212,6 @@ incluso con fines comerciales, siempre que incluyas el aviso de copyright y la l
 - OpenAI por GPT-4
 - Comunidad de Streamlit
 
-Si este proyecto te resulta útil, considera darle una estrella en GitHub
-
 Para preguntas o soporte: [Abrir un Issue](https://github.com/sandoz-back2work-team/Back2work-bot/issues)
 
 ---
