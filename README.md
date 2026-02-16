@@ -25,13 +25,13 @@ Back2work-bot/
 │   ├── gmail_connector.py      # Integración con Gmail API
 │   └── ...
 ├── docs/
-│   └── manual_usuario.pdf      # 📘 Documentación completa (TFM)
-├── local/secrets/              # ⚠️ Crear localmente (ver abajo)
+│   └── manual_usuario.pdf      # 📘 Documentación
+├── local/secrets/              # ⚠️ Se crea localmente
 ├── .gitignore                  # Archivos excluidos de Git
-│   ├── .env                    # Tu OpenAI API Key
-│   └── credentials.json        # Gmail OAuth (opcional)
+│   ├── .streamlit              # OpenAI API Key
+│   └── client_secret.json      # Gmail OAuth
 ├── requirements.txt
-├── iniciar_bot.bat             # Script de inicio Windows
+├── iniciar_bot.bat             # Script para inicializar app
 └── README.md
 ```
 
