@@ -34,7 +34,7 @@ Back2work-bot/
 └── README.md
 ```
 
-### Sobre `local/secrets/`
+### Sobre .streamlit y client_secret.json 
 
 Estos archivos **NO están en GitHub** por seguridad y debes crearlos manualmente.
 
