@@ -26,10 +26,9 @@ Back2work-bot/
 │   └── ...
 ├── docs/
 │   └── manual_usuario.pdf      # 📘 Documentación
-├── local/secrets/              # ⚠️ Se crea localmente
 ├── .gitignore                  # Archivos excluidos de Git
-│   ├── .streamlit              # OpenAI API Key
-│   └── client_secret.json      # Gmail OAuth
+├── .streamlit                  # ⚠️ OpenAI API Key - Se crea localmente
+├── client_secret.json          # Gmail OAuth
 ├── requirements.txt
 ├── iniciar_bot.bat             # Script para inicializar app
 └── README.md
