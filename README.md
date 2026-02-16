@@ -107,7 +107,7 @@ iniciar_bot.bat
 **Mac / Linux**: 
 ```bash
 source venv/bin/activate
-streamlit run app/main.py
+python -m streamlit run app/main.py
 ```
 
 La aplicación se abrirá en tu navegador en `http://localhost:8501`
