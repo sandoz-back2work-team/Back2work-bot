@@ -227,7 +227,6 @@ class GmailConnector:
                 if part['mimeType'] == 'text/html':
                     if part['body'].get('data'):
                         html = base64.urlsafe_b64decode(part['body']['data']).decode('utf-8', errors='ignore')
-                        # Aquí podrías usar BeautifulSoup para limpiar HTML, pero por simplicidad:
                         return html
         
         return ""
