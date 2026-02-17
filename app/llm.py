@@ -27,8 +27,13 @@ from priority_engine import calculate_priority_score, map_to_priority
 
 @st.cache_resource
 def get_openai_client():
-    api_key = st.secrets["OPENAI_API_KEY"]
-    return OpenAI(api_key=api_key)
+    try:
+        if "OPENAI_API_KEY" in st.secrets:
+            api_key = st.secrets["OPENAI_API_KEY"]
+            return OpenAI(api_key=api_key)
+    except (FileNotFoundError, Exception):
+        return None
+    return None
 
 # ============================================================================
 # ANÁLISIS AVANZADO DE CORREOS ELECTRÓNICOS
@@ -500,3 +505,4 @@ CONTEXT DATA:
         return resp.choices[0].message.content
     except: 
         return "❌ No se pudo generar el resumen automático." if lang == "es" else "❌ Could not generate automatic summary."
+
