@@ -69,7 +69,7 @@ st.markdown("""
 # ============================================================================
 
 def generate_interactive_plotly(df, lang="es"):
-    """Generate interactive Plotly charts for dashboard."""
+    """Generar gráficos interactivos de Plotly para el panel de control"""
     colors = [SANDOZ_NAVY, SANDOZ_BLUE, SANDOZ_LIGHT_BLUE, SANDOZ_PALE]
     h_size = 320  
     
@@ -946,7 +946,6 @@ def main():
                     selected_prio = [prio_reverse[x] for x in selected_prio_display]
                 
                 with col_f2:
-                    # Filtro Tipo - SOLO OBLIGATORIA POR DEFECTO
                     tipo_options_display = list(tipo_map.values())
                     default_tipo = [tipo_map["Mandatory"]] 
                     
