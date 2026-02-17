@@ -32,6 +32,7 @@ TRANSLATIONS = {
         # Mensajes de estado
         "upload_error": "⚠️ Sube un CSV.",
         "api_key_error": "⚠️ Falta API Key.",
+        "api_key_invalid": "⚠️ La API Key es incorrecta. Por favor, revísala.",
         "processing": "⏳ Leyendo, filtrando y analizando con IA...",
         "no_emails": "❌ No hay emails en",
         "analysis_complete": "✅ Análisis completado. Se han analizado {count} correos.",
@@ -226,6 +227,7 @@ TRANSLATIONS = {
         # Status messages
         "upload_error": "⚠️ Upload a CSV file.",
         "api_key_error": "⚠️ API Key missing.",
+        "api_key_invalid": "⚠️ The API Key is invalid. Please check it.",
         "processing": "⏳ Reading, filtering and analyzing with AI...",
         "no_emails": "❌ No emails found in",
         "analysis_complete": "✅ Analysis complete. {count} emails analyzed.",
