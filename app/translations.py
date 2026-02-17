@@ -398,15 +398,15 @@ TRANSLATIONS = {
 
 def t(key: str, lang: str = "es", **kwargs) -> str:
     """
-    Helper function to get translations
+    Función auxiliar para obtener traducciones
     
     Args:
-        key: Translation key
-        lang: Language code ('es' or 'en')
-        **kwargs: Variables to format into the translation string
+        key: Clave de traducción
+        lang: Código de idioma ('es' o 'en')
+        **kwargs: Variables para formatear en la cadena de traducción
         
     Returns:
-        Translated text with formatted variables
+        Texto traducido con las variables formateadas
     """
     text = TRANSLATIONS.get(lang, {}).get(key, TRANSLATIONS["es"].get(key, key))
     return text.format(**kwargs) if kwargs else text
