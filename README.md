@@ -38,7 +38,6 @@ Back2work-bot/
 Estos archivos **NO están en GitHub** por seguridad y debes crearlos manualmente.
 
 **Consulta**:
-- La sección [**Instalación**](#-instalación) más abajo para configuración rápida
 - El [**Manual de Usuario**](docs/manual_usuario.pdf) para guía detallada paso a paso
 
 > Los archivos de credenciales están protegidos en `.gitignore` y nunca se subirán al repositorio.
@@ -49,7 +48,7 @@ Estos archivos **NO están en GitHub** por seguridad y debes crearlos manualment
 
 ### Requisitos Previos
 
-- Python 3.8 o superior
+- Python 3.11
 - Cuenta de OpenAI con API Key
 - (Opcional) Cuenta de Gmail para integración directa
 
@@ -74,14 +73,9 @@ pip install -r requirements.txt
 
 4. **Configurar API Key de OpenAI**
 
-Opción A: Crear archivo `.streamlit/secrets.toml`
+Crear archivo `.streamlit/secrets.toml`
 ```toml
 OPENAI_API_KEY = "sk-..."
-```
-
-Opción B: Crear archivo `local/secrets/.env`
-```
-OPENAI_API_KEY=sk-...
 ```
 
 5. **Configurar Gmail (Opcional)**
@@ -90,7 +84,7 @@ Para usar la integración con Gmail:
 - Crear proyecto en Google Cloud Console
 - Habilitar Gmail API
 - Descargar credenciales OAuth 2.0
-- Guardar como `credentials.json` en `local/secrets/`
+- Guardar como `credentials.json`
 
 ## Uso
 
