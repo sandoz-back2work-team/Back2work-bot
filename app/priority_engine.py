@@ -35,7 +35,7 @@ _PROJECT_STOPWORDS = {
 
 
 def _strip_generic_head_tokens(norm_key: str) -> str:
-    """Remove generic leading tokens from project name."""
+    """Eliminar tokens genéricos iniciales del nombre del proyecto."""
     if not norm_key:
         return ""
     toks = norm_key.split()
@@ -47,7 +47,7 @@ def _strip_generic_head_tokens(norm_key: str) -> str:
 
 
 def _strip_generic_tail_tokens(norm_key: str) -> str:
-    """Remove generic trailing tokens from project name."""
+    """Eliminar tokens genéricos finales del nombre del proyecto."""
     if not norm_key:
         return ""
     toks = norm_key.split()
@@ -57,7 +57,7 @@ def _strip_generic_tail_tokens(norm_key: str) -> str:
 
 
 def _proj_norm_key_raw(s: str) -> str:
-    """Normalize project name for comparison."""
+    """Normalizar el nombre del proyecto para su comparación."""
     if not isinstance(s, str):
         s = "" if s is None else str(s)
     s = s.strip()
@@ -74,14 +74,14 @@ def _proj_norm_key_raw(s: str) -> str:
 
 
 def _proj_norm_key(s: str) -> str:
-    """Full normalization with head/tail token stripping."""
+    """Normalización completa con eliminación de tokens iniciales y finales."""
     raw = _proj_norm_key_raw(s)
     raw = _strip_generic_head_tokens(raw)
     return _strip_generic_tail_tokens(raw)
 
 
 def _proj_display_name(s: str) -> str:
-    """Get display name for project."""
+    """Obtener el nombre para mostrar del proyecto."""
     if not isinstance(s, str):
         s = "" if s is None else str(s)
     s = s.strip()
@@ -93,13 +93,13 @@ def _proj_display_name(s: str) -> str:
 
 
 def _is_abbrev_orig(orig: str) -> bool:
-    """Check if project name is an abbreviation."""
+    """Verificar si el nombre del proyecto es una abreviatura."""
     disp = _proj_display_name(orig or "")
     return bool(disp) and disp.isalpha() and disp.isupper() and 1 <= len(disp) <= 3
 
 
 def _projects_similar(a_key: str, b_key: str, a_orig: str = "", b_orig: str = "") -> bool:
-    """Determine if two project names are similar enough to merge."""
+    """Determinar si dos nombres de proyecto son lo suficientemente similares como para fusionarlos."""
     if not a_key or not b_key:
         return False
     if a_key == b_key:
@@ -414,20 +414,20 @@ def map_to_priority(
     Asignar el nivel final de prioridad (Alta/Media/Baja).
     
     Args:
-        sender: Sender address
-        subject: Subject line
-        body: Email body
-        email_type: Classified type
-        action_level: Mandatory/Optional/None
-        decision_level: Required/Optional/None
-        urgency: Immediate/Short-term/Medium-term/Low
-        blocks_others: Whether email blocks other people
-        score: Calculated priority score
-        importance: Email importance flag
-        user_config: User preferences dict
-        forced_priority: Override from LLM or rules
-        is_phishing: Phishing detection result
-        is_spam: Spam detection result
+        sender: Dirección del remitente
+        subject: Asunto del correo
+        body: Cuerpo del correo
+        email_type: Tipo clasificado
+        action_level: Obligatorio/Opcional/Ninguno
+        decision_level: Requerido/Opcional/Ninguno
+        urgency: Inmediato/Corto plazo/Mediano plazo/Bajo
+        blocks_others: Si el correo bloquea a otras personas
+        score: Puntuación de prioridad calculada
+        importance: Indicador de importancia del correo
+        user_config: Diccionario de preferencias del usuario
+        forced_priority: Anulación forzada por LLM o reglas
+        is_phishing: Resultado de detección de phishing
+        is_spam: Resultado de detección de spam
         
     Returns:
         "High", "Medium", or "Low"
