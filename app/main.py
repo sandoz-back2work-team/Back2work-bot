@@ -16,7 +16,7 @@ from typing import Any, Dict, List
 from datetime import datetime, date
 import pandas as pd
 from urllib.parse import quote
-from openai import OpenAI
+from openai import OpenAI, AuthenticationError
 
 # Importaciones locales
 from config import (
@@ -429,11 +429,19 @@ def main():
     if user_key:
         try:
             client = OpenAI(api_key=user_key)
+            client.models.list() 
             st.session_state['manual_openai_key'] = user_key
-            st.sidebar.success(t("api_key_success", lang)) 
+            st.sidebar.success(t("api_key_success", lang))
+        except AuthenticationError:
+            st.sidebar.error(t("api_key_invalid", lang))
+            client = None
         except Exception as e:
             st.sidebar.error(t("api_key_load_error", lang, error=e))
             client = None
+
+    if not client:
+        st.warning(t("api_key_error", lang))
+        st.stop()
     
     
     #FECHAS
