@@ -32,7 +32,7 @@ from email_processing import (
 )
 from security import is_phishing, is_spam, llm_security_analysis
 from priority_engine import unify_projects_in_df, calculate_priority_score, map_to_priority
-from llm import get_openai_client, llm_email_analysis_enhanced, llm_overall_summary
+from llm import get_openai_client, llm_email_analysis_enhanced, llm_overall_summary, ask_chat_with_context
 from gmail_connector import GmailConnector
 
 
@@ -1767,25 +1767,25 @@ def main():
                         st.write(p)
                 
                 with st.spinner(t("chat_analyzing", lang)):
-                    ctx = df_res[["sender", "subject", "summary", "priority"]].to_string()
-                    try:
-                        r = client.chat.completions.create(
-                            model=MODEL, 
-                            messages=[
-                                {"role": "system", "content": t("chat_system_prompt", lang)},
-                                {"role": "user", "content": f"DATOS:\n{ctx}\n\nPREGUNTA: {p}"}
-                            ]
-                        )
-                        ans = r.choices[0].message.content
-                        st.session_state.messages.append({"role": "assistant", "content": ans})
-                        
-                        with chat_container:
-                            with st.chat_message("assistant", avatar=clippo_img):
-                                st.write(ans)
-                        st.rerun() 
-                    except Exception as e: 
-                        st.error(f"Error: {e}")
 
+                    ctx = df_res[["sender", "subject", "summary", "priority", "deadline"]].to_string()
+                    
+                    ans = ask_chat_with_context(
+                        client=client,
+                        model=MODEL,
+                        system_prompt=t("chat_system_prompt", lang),
+                        user_question=p,
+                        context_data=ctx
+                    )
+                    
+                    st.session_state.messages.append({"role": "assistant", "content": ans})
+                    
+                    with chat_container:
+                        with st.chat_message("assistant", avatar=clippo_img):
+                            st.write(ans)
+                    
+                    st.rerun()
+                    
 if __name__ == "__main__":
     main()
 
