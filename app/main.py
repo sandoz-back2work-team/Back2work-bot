@@ -802,34 +802,44 @@ def main():
             
                 # DEDUPLICACIÓN DE HILOS
                 if not st.session_state.result_df.empty and 'threadId' in st.session_state.result_df.columns:
-                    df_temp = st.session_state.result_df.copy()
                     
-                    df_temp['dt_sort'] = pd.to_datetime(df_temp['date'], errors='coerce')
+                    # Verificar si hay threadIds válidos
+                    valid_threads = st.session_state.result_df['threadId'].dropna()
+                    valid_threads = valid_threads[
+                        (valid_threads.astype(str).str.strip() != '') &
+                        (valid_threads.astype(str).str.lower() != 'nan') &
+                        (valid_threads.astype(str).str.lower() != 'none') &
+                        (valid_threads.astype(str).str.len() > 5)
+                    ]
                     
-                    indices_to_downgrade = []
-                    
-                    groups = df_temp.dropna(subset=['threadId']).groupby('threadId')
-                    
-                    for thread_id, group in groups:
-                        if len(group) > 1:
-                            group = group.sort_values(by='dt_sort', ascending=False)
-                            
-                            old_indices = group.index[1:].tolist()
-                            indices_to_downgrade.extend(old_indices)
-                    
-                    if indices_to_downgrade:
-                        st.session_state.result_df.loc[indices_to_downgrade, 'priority'] = 'Low'
-                        st.session_state.result_df.loc[indices_to_downgrade, 'deadline'] = None
-
-                        history_prefix = "[HISTORIAL - Ver último correo]" if lang == "es" else "[HISTORY - See last email]"
-                        check_tag = "[HISTORIAL" if lang == "es" else "[HISTORY"
+                    if len(valid_threads) > 0:
+                        # Solo se ejecuta con Gmail
+                        df_temp = st.session_state.result_df.copy()
                         
-                        for idx in indices_to_downgrade:
-                            st.session_state.result_df.at[idx, 'tasks'] = []
-                            current_summary = st.session_state.result_df.at[idx, 'summary']
-
-                            if check_tag not in str(current_summary):
-                                st.session_state.result_df.at[idx, 'summary'] = f"{history_prefix} {current_summary}"
+                        df_temp['dt_sort'] = pd.to_datetime(df_temp['date'], errors='coerce')
+                        
+                        indices_to_downgrade = []
+                        
+                        groups = df_temp.dropna(subset=['threadId']).groupby('threadId')
+                        
+                        for thread_id, group in groups:
+                            if len(group) > 1:
+                                group = group.sort_values(by='dt_sort', ascending=False)
+                                
+                                old_indices = group.index[1:].tolist()
+                                indices_to_downgrade.extend(old_indices)
+                        
+                        if indices_to_downgrade:
+                            st.session_state.result_df.loc[indices_to_downgrade, 'priority'] = 'Low'
+                            st.session_state.result_df.loc[indices_to_downgrade, 'deadline'] = None
+                            history_prefix = "[HISTORIAL - Ver último correo]" if lang == "es" else "[HISTORY - See last email]"
+                            check_tag = "[HISTORIAL" if lang == "es" else "[HISTORY"
+                            
+                            for idx in indices_to_downgrade:
+                                st.session_state.result_df.at[idx, 'tasks'] = []
+                                current_summary = st.session_state.result_df.at[idx, 'summary']
+                                if check_tag not in str(current_summary):
+                                    st.session_state.result_df.at[idx, 'summary'] = f"{history_prefix} {current_summary}"
 
 
                 # UNIFICACIÓN DE PROYECTOS
