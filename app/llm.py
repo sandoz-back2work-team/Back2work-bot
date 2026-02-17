@@ -506,3 +506,28 @@ CONTEXT DATA:
     except: 
         return "❌ No se pudo generar el resumen automático." if lang == "es" else "❌ Could not generate automatic summary."
 
+# ============================================================================
+# CREACIÓN DE CHAT
+# ============================================================================
+
+def ask_chat_with_context(client, model, system_prompt, user_question, context_data):
+    """
+    Función para manejar el chat con contexto de emails.
+    """
+    
+    today_info = datetime.now().strftime("%d/%m/%Y (%A)")
+    
+    full_user_message = f"FECHA DE HOY: {today_info}\n\nDATOS:\n{context_data}\n\nPREGUNTA: {user_question}"
+
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": full_user_message}
+            ]
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Error generando respuesta: {str(e)}"
+
