@@ -446,11 +446,11 @@ def llm_overall_summary(
     Genera un resumen ejecutivo de los correos de alta prioridad.
     
     Args:
-        client: OpenAI client
-        high_priority_emails: List of high priority email dicts
-        total_emails: Total number of emails analyzed
-        range_text: Date range description
-        lang: Language code (es/en)
+        client: Cliente OpenAI
+        high_priority_emails: Lista de email de alta prioridad
+        total_emails: Número total de emails 
+        range_text: Descripción del periodo
+        lang: Leguaje del código
         
     Returns:
         Texto del resumen ejecutivo
@@ -530,4 +530,5 @@ def ask_chat_with_context(client, model, system_prompt, user_question, context_d
         return response.choices[0].message.content
     except Exception as e:
         return f"Error generando respuesta: {str(e)}"
+
 
