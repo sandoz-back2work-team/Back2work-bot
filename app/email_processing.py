@@ -147,7 +147,7 @@ def clean_sender_display(name: str, addr: str) -> str:
 
 def clean_contacts_display(raw_text):
     """
-    Limpia los campos Para/CC para evitar duplicados como 'email' email.
+    Limpia los campos Para/CC para evitar duplicados.
     """
     if not raw_text or str(raw_text).lower() == 'nan':
         return "-"
