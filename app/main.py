@@ -1774,7 +1774,8 @@ def main():
                         model=MODEL,
                         system_prompt=t("chat_system_prompt", lang),
                         user_question=p,
-                        context_data=ctx
+                        context_data=ctx,
+                        history=st.session_state.messages
                     )
                     
                     st.session_state.messages.append({"role": "assistant", "content": ans})
